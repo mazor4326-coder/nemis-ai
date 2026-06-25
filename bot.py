@@ -468,7 +468,7 @@ def get_ai_resp(prompt, lang="ru"):
 
 def get_main_kb(uid, lang):
     t = TEXTS.get(lang, TEXTS['ru'])
-    web_app_url = os.getenv("WEB_APP_URL", "https://nemis-ai.onrender.com/assistant")
+    web_app_url = os.getenv("WEB_APP_URL", "https://nemis-ai.onrender.com/assistant").strip()
     rows = [
         [{"text": t['ai_btn'], "web_app": {"url": web_app_url}}],
         [{"text": t['subs_btn']}],
