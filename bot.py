@@ -1797,6 +1797,9 @@ def main():
     
     # Start regression checker background thread
     threading.Thread(target=check_daily_regression, daemon=True).start()
+
+    # Set default menu button
+    set_default_menu_button()
     
     offset = 0
     with ThreadPoolExecutor(max_workers=50) as ex:
