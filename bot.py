@@ -470,8 +470,7 @@ def get_main_kb(uid, lang):
     t = TEXTS.get(lang, TEXTS['ru'])
     rows = [
         [{"text": t['ai_btn']}],
-        [{"text": t['subs_btn']}],
-        [{"text": t['founder_btn']}, {"text": t['support_btn']}]
+        [{"text": t['founder_btn']}]
     ]
     return {"keyboard": rows, "resize_keyboard": True}
 
