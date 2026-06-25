@@ -1151,6 +1151,9 @@ document.getElementById('reg-form').addEventListener('submit', async (e) => {
             document.getElementById('registration-view').style.display = 'none';
             switchView('dashboard');
             renderDashboard();
+            if (userDetails.sub === 'none') {
+                document.getElementById('payment-modal').style.display = 'flex';
+            }
         } else {
             const data = await response.json();
             alert(data.error || "Xatolik yuz berdi");
@@ -1185,6 +1188,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             document.getElementById('login-view').style.display = 'none';
             switchView('dashboard');
             renderDashboard();
+            if (userDetails.sub === 'none') {
+                document.getElementById('payment-modal').style.display = 'flex';
+            }
         } else {
             const data = await response.json();
             alert(data.error || "Xatolik yuz berdi");
