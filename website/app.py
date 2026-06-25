@@ -177,6 +177,22 @@ def webapp_login():
         
     return {"status": "ok"}
 
+@app.route('/api/webapp_reset_password', methods=['POST'])
+def webapp_reset_password():
+    data = request.get_json(silent=True) or {}
+    uid = str(data.get('user_id', '')).strip()
+    new_password = data.get('password', '').strip()
+    
+    if not uid or not new_password:
+        return {"error": "Yangi parolni kiriting"}, 400
+        
+    conn = get_db_connection()
+    conn.execute("UPDATE users SET webapp_password=? WHERE id=?", (new_password, uid))
+    conn.commit()
+    conn.close()
+    
+    return {"status": "ok"}
+
 @app.route('/api/save_level', methods=['POST'])
 def save_level():
     data = request.get_json(silent=True) or {}

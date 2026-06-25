@@ -1199,6 +1199,55 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     }
 });
 
+// Reset Password Flow
+document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('reset-view').style.display = 'flex';
+});
+
+document.getElementById('back-to-login-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('reset-view').style.display = 'none';
+    document.getElementById('login-view').style.display = 'flex';
+});
+
+document.getElementById('reset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('reset-password').value.trim();
+    if(!password) return;
+    
+    try {
+        const btn = document.querySelector('#reset-form button');
+        btn.textContent = "Kuting...";
+        btn.disabled = true;
+        
+        const response = await fetch(API_BASE + '/api/webapp_reset_password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, password })
+        });
+        
+        if(response.ok) {
+            alert("Parol muvaffaqiyatli tiklandi!");
+            document.getElementById('reset-view').style.display = 'none';
+            document.getElementById('login-view').style.display = 'flex';
+            btn.innerHTML = `Saqlash <i class="fa-solid fa-check"></i>`;
+            btn.disabled = false;
+        } else {
+            const data = await response.json();
+            alert(data.error || "Xatolik yuz berdi");
+            btn.innerHTML = `Saqlash <i class="fa-solid fa-check"></i>`;
+            btn.disabled = false;
+        }
+    } catch(e) {
+        alert("Tarmoq xatosi!");
+        const btn = document.querySelector('#reset-form button');
+        btn.innerHTML = `Saqlash <i class="fa-solid fa-check"></i>`;
+        btn.disabled = false;
+    }
+});
+
 // Init
 applyLanguage(userLang);
 loadUserData();

@@ -51,6 +51,27 @@
                 </div>
                 <button type="submit" class="auth-btn">Tizimga kirish <i class="fa-solid fa-right-to-bracket"></i></button>
             </form>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-color);">
+                Parolni unutdingizmi? <a href="#" id="forgot-password-link" style="color: var(--accent-gold); text-decoration: none;">Tiklash</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Reset Password View -->
+    <div class="auth-container" id="reset-view" style="display: none;">
+        <div class="auth-card">
+            <h2 class="auth-title">Parolni tiklash</h2>
+            <p class="auth-subtitle">Yangi parolni kiriting va saqlang</p>
+            <form id="reset-form">
+                <div class="input-group">
+                    <label>Yangi Parol</label>
+                    <input type="password" id="reset-password" required placeholder="Yangi parolni o'ylab toping">
+                </div>
+                <button type="submit" class="auth-btn">Saqlash <i class="fa-solid fa-check"></i></button>
+            </form>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-color);">
+                <a href="#" id="back-to-login-link" style="color: var(--accent-gold); text-decoration: none;">Orqaga qaytish</a>
+            </p>
         </div>
     </div>
 
