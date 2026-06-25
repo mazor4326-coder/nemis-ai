@@ -14,7 +14,7 @@ if sys.platform == "win32":
 
 TELEGRAM_BOT_TOKEN = os.getenv("BOT_TOKEN")
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
-OWNER_IDS = ["1477103854", "5543183063"]
+OWNER_IDS = ["5543183063"]
 
 # SO'KINISH DETEKTORI (RU + UZ Kirill + UZ Latin)
 BAD_WORDS = [
