@@ -1785,7 +1785,6 @@ def check_daily_regression():
         time.sleep(3600)  # Check every hour
 
 def main():
-    set_default_menu_button()
     
     # Start regression checker background thread
     threading.Thread(target=check_daily_regression, daemon=True).start()
