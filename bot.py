@@ -468,12 +468,12 @@ def get_ai_resp(prompt, lang="ru"):
 
 def get_main_kb(uid, lang):
     t = TEXTS.get(lang, TEXTS['ru'])
+    web_app_url = os.getenv("WEB_APP_URL", "https://nemis-ai.onrender.com/assistant")
     rows = [
-        [{"text": t['ai_btn']}],
+        [{"text": t['ai_btn'], "web_app": {"url": web_app_url}}],
         [{"text": t['subs_btn']}],
         [{"text": t['founder_btn']}, {"text": t['support_btn']}]
     ]
-    # Admin main menu button removed to clean up UI for owners
     return {"keyboard": rows, "resize_keyboard": True}
 
 ENTRANCE_EXAMS = {
@@ -1398,21 +1398,12 @@ def handle_update(upd):
     if txt == '/start':
         db.update_user(uid, step="main")
         
-        # Asosiy menyuni yangilash uchun bildirishnoma jo'natamiz
-        send_msg(cid, "Asosiy menyu yangilandi / Главное меню обновлено \u2193", kb=get_main_kb(uid, lang))
-        
         welcome_text = (
             "Assalomu alaykum! 👋 Abdulaziz NEMIS AI raqamli akademiyamizga xush kelibsiz! 🏛✨\n\n"
             "Bu yerda ortiqcha vaqt yo‘qotishlarsiz ⏳, uzoq yo‘l yurmasdan 🚷, uyingizda o‘tirib 24/7 rejimda mukammal bilim olasiz! 🧠💻 Bizning tizim dangasalikni butunlay yo‘q qiladi va yuqori natija beradi. 🎯🔥\n\n"
             "Qoidalarimiz qattiq, lekin adolatli. 🛡⚖️ O‘z darajangizni tanlang va maqsad sari ilk qadamni bosing! 🚀🏁"
         )
-        web_app_url = os.getenv("WEB_APP_URL", "https://nemis-ai.onrender.com/assistant")
-        kb = {
-            "inline_keyboard": [
-                [{"text": "🇩🇪 Nemis tilini o'rganish / Начать обучение", "web_app": {"url": web_app_url}}]
-            ]
-        }
-        send_msg(cid, welcome_text, kb=kb)
+        send_msg(cid, welcome_text, kb=get_main_kb(uid, lang))
         return
 
     if (txt == '/admin' or txt.lower() in ['admin', 'админ']) and is_owner:
