@@ -615,6 +615,19 @@ def fake_payment():
     conn.close()
     return redirect('/admin')
 
+def keep_alive():
+    while True:
+        try:
+            import urllib.request
+            urllib.request.urlopen("https://nemis-ai.onrender.com/")
+        except:
+            pass
+        import time
+        time.sleep(14 * 60)
+
+import threading
+threading.Thread(target=keep_alive, daemon=True).start()
+
 if __name__ == '__main__':
     os.makedirs('templates', exist_ok=True)
     print("Abdulaziz Nemis AI Web Server starting on http://localhost:5000")
