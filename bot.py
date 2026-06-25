@@ -1209,6 +1209,20 @@ def handle_update(upd):
                 send_msg(cid, TEXTS[l]['req_contact'], kb={"keyboard": [[{"text": TEXTS[l]['contact_btn'], "request_contact": True}]], "resize_keyboard": True})
                 return
             else:
+                if txt == '/start':
+                    welcome_text = (
+                        "Assalomu alaykum! 👋 Abdulaziz NEMIS AI raqamli akademiyamizga xush kelibsiz! 🏛✨\n\n"
+                        "Bu yerda ortiqcha vaqt yo‘qotishlarsiz ⏳, uzoq yo‘l yurmasdan 🚷, uyingizda o‘tirib 24/7 rejimda mukammal bilim olasiz! 🧠💻 Bizning tizim dangasalikni butunlay yo‘q qiladi va yuqori natija beradi. 🎯🔥\n\n"
+                        "Qoidalarimiz qattiq, lekin adolatli. 🛡⚖️ O‘z darajangizni tanlang va maqsad sari ilk qadamni bosing! 🚀🏁"
+                    )
+                    web_app_url = os.getenv("WEB_APP_URL", "https://nemis-ai.onrender.com/assistant").strip()
+                    inline_kb = {
+                        "inline_keyboard": [
+                            [{"text": "🇩🇪 Nemis tilini o'rganish / Начать обучение", "web_app": {"url": web_app_url}}]
+                        ]
+                    }
+                    send_msg(cid, welcome_text, kb=inline_kb)
+
                 lang_prompt = (
                     "Salom! Tilni tanlang / Здравствуйте! Выберите язык / Hello! Choose language / Wählen Sie Ihre Sprache:\n\n"
                     "💡 *Продвинутая фишка (Для углубленного изучения):* Если вы хотите погрузиться в среду на 100%, выберите 4-й язык интерфейса — *🇩🇪 Deutsch*.\n"
