@@ -7,18 +7,7 @@ from flask import Flask
 # Load .env file
 load_dotenv()
 
-# Web server for Render
-app = Flask('')
-@app.route('/')
-def home(): return "Abdulaziz Nemis AI Bot is running!"
-def run():
-    try:
-        port = int(os.environ.get("PORT", 10000))
-        app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
-    except: pass
-def keep_alive():
-    threading.Thread(target=run, daemon=True).start()
-
+# No need for dummy Flask app, gunicorn handles it
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -1805,7 +1794,7 @@ def check_daily_regression():
         time.sleep(3600)  # Check every hour
 
 def main():
-    keep_alive(); set_default_menu_button()
+    set_default_menu_button()
     
     # Start regression checker background thread
     threading.Thread(target=check_daily_regression, daemon=True).start()
