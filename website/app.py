@@ -104,32 +104,78 @@ def get_or_create_user_data():
         return {"error": "Missing user_id"}, 400
     
     conn = get_db_connection()
-    user = conn.execute("SELECT name, username, phone, current_lesson, selected_level, last_activity, sub FROM users WHERE id=?", (uid,)).fetchone()
+    user = conn.execute("SELECT name, username, phone, current_lesson, selected_level, last_activity, sub, webapp_password, webapp_surname FROM users WHERE id=?", (uid,)).fetchone()
     if not user:
         # Create user with default values
         conn.execute("INSERT OR IGNORE INTO users (id, name, username, step, current_lesson, last_activity) VALUES (?,?,?, 'main', 1, NULL)", (uid, name, username))
         conn.commit()
         res = {
             "name": name,
+            "surname": "",
             "username": username,
             "phone": "",
             "current_lesson": 1,
             "selected_level": None,
             "last_activity": None,
-            "sub": "none"
+            "sub": "none",
+            "webapp_registered": False
         }
     else:
         res = {
             "name": user['name'] or name,
+            "surname": user['webapp_surname'] or "",
             "username": user['username'] or username,
             "phone": user['phone'] or "",
             "current_lesson": user['current_lesson'] or 1,
             "selected_level": user['selected_level'],
             "last_activity": user['last_activity'],
-            "sub": user['sub'] or "none"
+            "sub": user['sub'] or "none",
+            "webapp_registered": bool(user['webapp_password'])
         }
     conn.close()
     return res
+
+@app.route('/api/webapp_register', methods=['POST'])
+def webapp_register():
+    data = request.get_json(silent=True) or {}
+    uid = str(data.get('user_id', '')).strip()
+    name = data.get('name', '').strip()
+    surname = data.get('surname', '').strip()
+    password = data.get('password', '').strip()
+    
+    if not uid or not name or not password:
+        return {"error": "Barcha maydonlarni to'ldiring"}, 400
+        
+    conn = get_db_connection()
+    user = conn.execute("SELECT id FROM users WHERE id=?", (uid,)).fetchone()
+    if not user:
+        conn.execute("INSERT INTO users (id, name, webapp_surname, webapp_password, step, current_lesson) VALUES (?, ?, ?, ?, 'main', 1)", (uid, name, surname, password))
+    else:
+        conn.execute("UPDATE users SET name=?, webapp_surname=?, webapp_password=? WHERE id=?", (name, surname, password, uid))
+    conn.commit()
+    conn.close()
+    return {"status": "ok"}
+
+@app.route('/api/webapp_login', methods=['POST'])
+def webapp_login():
+    data = request.get_json(silent=True) or {}
+    uid = str(data.get('user_id', '')).strip()
+    password = data.get('password', '').strip()
+    
+    if not uid or not password:
+        return {"error": "Parolni kiriting"}, 400
+        
+    conn = get_db_connection()
+    user = conn.execute("SELECT webapp_password FROM users WHERE id=?", (uid,)).fetchone()
+    conn.close()
+    
+    if not user or not user['webapp_password']:
+        return {"error": "Foydalanuvchi topilmadi. Iltimos ro'yxatdan o'ting."}, 404
+        
+    if user['webapp_password'] != password:
+        return {"error": "Parol noto'g'ri. Iltimos qayta urinib ko'ring."}, 401
+        
+    return {"status": "ok"}
 
 @app.route('/api/save_level', methods=['POST'])
 def save_level():
@@ -409,6 +455,21 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+def upgrade_schema():
+    conn = get_db_connection()
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN webapp_password TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN webapp_surname TEXT")
+    except sqlite3.OperationalError:
+        pass
+    conn.commit()
+    conn.close()
+
+upgrade_schema()
 
 @app.route('/admin')
 @requires_auth

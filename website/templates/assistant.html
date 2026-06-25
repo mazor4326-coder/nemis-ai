@@ -16,8 +16,72 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <!-- Registration View -->
+    <div class="auth-container" id="registration-view" style="display: none;">
+        <div class="auth-card">
+            <h2 class="auth-title">Ro'yxatdan o'tish</h2>
+            <p class="auth-subtitle">Platformadan foydalanish uchun ro'yxatdan o'ting</p>
+            <form id="reg-form">
+                <div class="input-group">
+                    <label>Ism</label>
+                    <input type="text" id="reg-name" required placeholder="Ismingizni kiriting">
+                </div>
+                <div class="input-group">
+                    <label>Familiya</label>
+                    <input type="text" id="reg-surname" required placeholder="Familiyangizni kiriting">
+                </div>
+                <div class="input-group">
+                    <label>Parol</label>
+                    <input type="password" id="reg-password" required placeholder="Kuchli parol o'ylab toping">
+                </div>
+                <button type="submit" class="auth-btn">Ro'yxatdan o'tish <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login View -->
+    <div class="auth-container" id="login-view" style="display: none;">
+        <div class="auth-card">
+            <h2 class="auth-title">Xush kelibsiz!</h2>
+            <p class="auth-subtitle">Shaxsiy kabinetga kirish uchun parolni kiriting</p>
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Parol</label>
+                    <input type="password" id="login-password" required placeholder="Parolingizni kiriting">
+                </div>
+                <button type="submit" class="auth-btn">Tizimga kirish <i class="fa-solid fa-right-to-bracket"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="payment-modal" style="display: none;">
+        <div class="modal-content payment-content">
+            <div class="payment-icon"><i class="fa-solid fa-lock"></i></div>
+            <h2 class="payment-title">Kurs yopiq</h2>
+            <p class="payment-desc">Nemis tili kurslarini to'liq ochish uchun to'lov qiling.</p>
+            <div class="payment-price">100,000 UZS</div>
+            
+            <div class="payment-card-box">
+                <p>To'lov uchun karta raqami:</p>
+                <div class="card-number" onclick="navigator.clipboard.writeText('8888014490626927')">
+                    8888 0144 9062 6927 <i class="fa-regular fa-copy"></i>
+                </div>
+                <p class="card-owner">Qabul qiluvchi: <b>Камолов Абдулазиз</b></p>
+            </div>
+            
+            <div class="payment-instruction">
+                <p>1. Yuqoridagi kartaga 100,000 so'm o'tkazing.</p>
+                <p>2. To'lov chekini skrinshot qiling.</p>
+                <p>3. Skrinshotni ushbu botga qaytib yuboring.</p>
+            </div>
+            
+            <button class="action-btn primary-btn w-100" id="close-payment-modal">Tushundim, to'lov qilaman</button>
+        </div>
+    </div>
+
     <!-- 1. Dashboard View -->
-    <div class="chat-container" id="dashboard-view">
+    <div class="chat-container" id="dashboard-view" style="display: none;">
         <header class="chat-header">
             <div class="header-left">
                 <div class="avatar-container">

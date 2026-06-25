@@ -683,6 +683,7 @@ async function loadUserData() {
             userDetails.username = data.username || userUsername;
             userDetails.phone = data.phone || '';
             userDetails.sub = data.sub || 'none';
+            userDetails.webapp_registered = data.webapp_registered || false;
             
             // Har doim avval qoidalar (warning) oynasini ko'rsat
             welcomeModal.classList.remove('hidden');
@@ -734,11 +735,14 @@ acceptChallengeBtn.addEventListener('click', () => {
     }
     // Hide warning screen
     screenWarning.classList.add('hidden');
-    
-    // The user requested: "srazu menuga kirishi kerak" (immediately open dashboard)
     welcomeModal.classList.add('hidden');
-    switchView('dashboard');
-    renderDashboard();
+    
+    // Instead of dashboard, show auth views
+    if (userDetails.webapp_registered) {
+        document.getElementById('login-view').style.display = 'flex';
+    } else {
+        document.getElementById('registration-view').style.display = 'flex';
+    }
 });
 
 // Decline challenge button handler
@@ -1047,11 +1051,19 @@ function renderLessonsList() {
 
 // Dashboard button clicks
 document.getElementById('btn-read-lesson').addEventListener('click', () => {
+    if (userDetails.sub === 'none') {
+        document.getElementById('payment-modal').style.display = 'flex';
+        return;
+    }
     switchView('lessonsList');
     renderLessonsList();
 });
 
 document.getElementById('btn-chat-tutor').addEventListener('click', () => {
+    if (userDetails.sub === 'none') {
+        document.getElementById('payment-modal').style.display = 'flex';
+        return;
+    }
     switchView('chat');
     renderChat();
 });
@@ -1067,6 +1079,10 @@ document.getElementById('change-level-btn').addEventListener('click', () => {
 });
 
 document.getElementById('btn-take-exam').addEventListener('click', () => {
+    if (userDetails.sub === 'none') {
+        document.getElementById('payment-modal').style.display = 'flex';
+        return;
+    }
     welcomeModal.classList.remove('hidden');
     screenWarning.classList.add('hidden');
     screenLevel.classList.add('hidden');
@@ -1097,6 +1113,90 @@ if (lessonsListBackBtn && !lessonsListBackBtn.hasAttribute('data-listener')) {
 
 document.getElementById('lesson-back-btn').addEventListener('click', () => {
     switchView('lessonsList');
+});
+
+// Payment Modal Logic
+document.getElementById('close-payment-modal').addEventListener('click', () => {
+    document.getElementById('payment-modal').style.display = 'none';
+    if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
+        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e){}
+    }
+    // Optionally close webapp to force them to send screenshot to bot
+    tg.close();
+});
+
+// Auth Logic
+document.getElementById('reg-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('reg-name').value.trim();
+    const surname = document.getElementById('reg-surname').value.trim();
+    const password = document.getElementById('reg-password').value.trim();
+    
+    if(!name || !surname || !password) return;
+    
+    try {
+        const btn = document.querySelector('#reg-form button');
+        btn.textContent = "Kuting...";
+        btn.disabled = true;
+        
+        const response = await fetch(API_BASE + '/api/webapp_register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, name, surname, password })
+        });
+        
+        if(response.ok) {
+            userDetails.name = name;
+            userDetails.webapp_registered = true;
+            document.getElementById('registration-view').style.display = 'none';
+            switchView('dashboard');
+            renderDashboard();
+        } else {
+            const data = await response.json();
+            alert(data.error || "Xatolik yuz berdi");
+            btn.innerHTML = `Ro'yxatdan o'tish <i class="fa-solid fa-arrow-right"></i>`;
+            btn.disabled = false;
+        }
+    } catch(e) {
+        alert("Tarmoq xatosi!");
+        const btn = document.querySelector('#reg-form button');
+        btn.innerHTML = `Ro'yxatdan o'tish <i class="fa-solid fa-arrow-right"></i>`;
+        btn.disabled = false;
+    }
+});
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('login-password').value.trim();
+    if(!password) return;
+    
+    try {
+        const btn = document.querySelector('#login-form button');
+        btn.textContent = "Kuting...";
+        btn.disabled = true;
+        
+        const response = await fetch(API_BASE + '/api/webapp_login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, password })
+        });
+        
+        if(response.ok) {
+            document.getElementById('login-view').style.display = 'none';
+            switchView('dashboard');
+            renderDashboard();
+        } else {
+            const data = await response.json();
+            alert(data.error || "Xatolik yuz berdi");
+            btn.innerHTML = `Tizimga kirish <i class="fa-solid fa-right-to-bracket"></i>`;
+            btn.disabled = false;
+        }
+    } catch(e) {
+        alert("Tarmoq xatosi!");
+        const btn = document.querySelector('#login-form button');
+        btn.innerHTML = `Tizimga kirish <i class="fa-solid fa-right-to-bracket"></i>`;
+        btn.disabled = false;
+    }
 });
 
 // Init
