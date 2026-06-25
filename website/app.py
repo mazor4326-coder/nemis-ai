@@ -18,6 +18,14 @@ TELEGRAM_BOT_TOKEN = os.getenv("BOT_TOKEN")
 def send_telegram_msg(chat_id, text):
     if not TELEGRAM_BOT_TOKEN:
         return
+
+@app.route('/bot_log')
+def get_bot_log():
+    try:
+        with open('../bot.log', 'r', encoding='utf-8') as f:
+            return Response(f.read(), mimetype='text/plain')
+    except Exception as e:
+        return str(e)
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {'chat_id': chat_id, 'text': text, 'parse_mode': 'Markdown'}
     try:
