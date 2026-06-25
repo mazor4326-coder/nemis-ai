@@ -1,0 +1,4 @@
+YUKSAK ACADEMY Web Server starting on http://localhost:5000
+Admin Panel available at http://localhost:5000/admin
+ * Serving Flask app 'app'
+ * Debug mode: off
