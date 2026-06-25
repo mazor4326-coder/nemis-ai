@@ -1397,9 +1397,6 @@ def handle_update(upd):
     if txt == '/start':
         db.update_user(uid, step="main")
         
-        # 1. Send short text to apply bottom keyboard
-        send_msg(cid, "Muvaffaqiyatli kirdingiz! / Успешный вход! \u2193", kb=get_main_kb(uid, lang))
-        
         # 2. Send the beautiful welcome text with the Inline Web App Button
         welcome_text = (
             "Assalomu alaykum! 👋 Abdulaziz NEMIS AI raqamli akademiyamizga xush kelibsiz! 🏛✨\n\n"
