@@ -1119,7 +1119,7 @@ def handle_update(upd):
                     c.execute("INSERT INTO payments (user_id, amount, date, phone, tariff) VALUES (?,?,?,?,?)", (target_uid, amount, pay_date, phone, plan))
                     c.commit(); c.close()
                     
-                send_msg(target_uid, "✅ To'lov qabul qilindi!"); send_msg(cid, f"✅ OK: {target_uid} ({plan.upper()})")
+                send_msg(target_uid, "✅ To'lov qabul qilindi! Kursga kirish ruxsati ochildi."); send_msg(cid, f"✅ OK: {target_uid} ({plan.upper()})")
             elif action == "no": db.update_user(target_uid, step='main'); send_msg(target_uid, "❌ To'lov rad etildi."); send_msg(cid, f"❌ NO: {target_uid}")
             elif action == "fake": db.update_user(target_uid, banned=1); send_msg(target_uid, "🚫 FAKE uchun BAN!"); send_msg(cid, f"🚫 BANNED: {target_uid}")
         
@@ -1370,8 +1370,11 @@ def handle_update(upd):
         return
 
     if 'photo' in m and not is_owner:
-        if u.get('step', '').startswith("awaiting_payment||"):
-            plan = u['step'].split("||")[1]
+        if u.get('sub') == 'none' or u.get('step', '').startswith("awaiting_payment||"):
+            plan = "Standard" # Default for Web App payment
+            if u.get('step', '').startswith("awaiting_payment||"):
+                plan = u['step'].split("||")[1]
+            
             caption = f"📸 YANGI CHEK KELDI!\n\n👤 Foydalanuvchi: {u.get('name')} ({fmt_username(u.get('username'))})\n🆔 ID: {uid}\n📱 Telefon: {u.get('phone')}\n💰 Status: To'lov cheki yuborildi."
             kb = {"inline_keyboard": [[
                 {"text": "✅ OK", "callback_data": f"adm_pay_ok_{plan}_{uid}"},
@@ -1380,7 +1383,12 @@ def handle_update(upd):
             ]]}
             for oid in OWNER_IDS:
                 send_photo(oid, m['photo'][-1]['file_id'], caption=caption, kb=kb)
-            send_msg(cid, "✅ Qabul qilindi!"); return
+            
+            if u.get('step', '').startswith("awaiting_payment||"):
+                db.update_user(uid, step='main')
+                
+            send_msg(cid, "✅ Qabul qilindi! Administrator tasdiqlashini kuting.")
+            return
         else:
             warn_msgs = {
                 'ru': "⚠️ Не нарушайте правила бота, только пишите.",

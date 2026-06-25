@@ -104,7 +104,29 @@ def get_or_create_user_data():
         return {"error": "Missing user_id"}, 400
     
     conn = get_db_connection()
-    user = conn.execute("SELECT name, username, phone, current_lesson, selected_level, last_activity, sub, webapp_password, webapp_surname FROM users WHERE id=?", (uid,)).fetchone()
+    user = conn.execute("SELECT name, username, phone, current_lesson, selected_level, last_activity, sub, sub_expire, webapp_password, webapp_surname FROM users WHERE id=?", (uid,)).fetchone()
+    
+    # Check if subscription has expired
+    if user and user['sub'] != 'none' and user['sub_expire']:
+        try:
+            exp_time = time.mktime(time.strptime(user['sub_expire'], '%Y-%m-%d %H:%M:%S'))
+            if time.time() > exp_time:
+                conn.execute("UPDATE users SET sub='none' WHERE id=?", (uid,))
+                conn.commit()
+                # Inform the user via bot that their sub expired
+                try:
+                    import os, urllib.request, urllib.parse
+                    bot_token = os.getenv("BOT_TOKEN")
+                    msg = "⚠️ 1 oy o'tdi, darslarni davom ettirish uchun to'lov qilishingiz kerak.\nIltimos, darslarni davom ettirish uchun to'lov qiling."
+                    p = {'chat_id': uid, 'text': msg, 'parse_mode': 'Markdown'}
+                    urllib.request.urlopen(f"https://api.telegram.org/bot{bot_token}/sendMessage", data=urllib.parse.urlencode(p).encode('utf-8'))
+                except:
+                    pass
+                user = dict(user)
+                user['sub'] = 'none'
+        except Exception as e:
+            print(f"Error checking sub expiry: {e}")
+            
     if not user:
         # Create user with default values
         conn.execute("INSERT OR IGNORE INTO users (id, name, username, step, current_lesson, last_activity) VALUES (?,?,?, 'main', 1, NULL)", (uid, name, username))
